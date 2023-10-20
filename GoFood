@@ -1,0 +1,96 @@
+CREATE DATABASE `AoL_DB` 
+CREATE TABLE `toko` (
+  `IDToko` char(100) NOT NULL, 
+  `NamaToko` varchar(100) NOT NULL, 
+  `AlamatToko` varchar(100) NOT NULL);
+
+CREATE TABLE `Pelanggan` (
+  `IDPelanggan` char(100) NOT NULL, 
+  `NamaPelanggan` varchar(100) NOT NULL, 
+  `AlamatPelanggan` varchar(100) NOT NULL);
+
+CREATE TABLE `Produk` (
+  `IDProduk` char(100) NOT NULL, 
+  `NamaProduk` varchar(100) NOT NULL, 
+  `Harga` int NOT NULL);
+
+CREATE TABLE `Driver` (
+  `IDDriver` char(100) NOT NULL, 
+  `NamaDriver` varchar(100) NOT NULL, 
+  `PlatDriver` varchar(100) NOT NULL, 
+  `MotorDriver` varchar(100) NOT NULL);
+
+CREATE TABLE `DetailTransaksi` ( 
+  `OrderID` char(100) NOT NULL, 
+  `IDProduk` char(100) NOT NULL, 
+  `Jumlah` int NOT NULL, 
+  `JumlahHarga` int NOT NULL, 
+  `pajak` int NOT NULL, 
+  `BiayaPengiriman` int NOT NULL, 
+  `HargaTotal` int NOT NULL);
+
+CREATE TABLE `Transaksi` (
+  `OrderID` char(100) NOT NULL, 
+  `OrderDate` date NOT NULL, 
+  `IDPelanggan` char(100) NOT NULL, 
+  `IDDriver` char(100) NOT NULL, 
+  `IDToko` char(100) NOT NULL, 
+  `WaktuPemesanan` time NOT NULL, 
+  `WaktuPenerimaan` time NOT NULL);
+
+INSERT INTO `detailtransaksi` (`OrderID`, `IDProduk`, `Jumlah`, `JumlahHarga`, `Pajak`, `BiayaPengiriman`, `HargaTotal`) VALUES
+  ('F-1942805643', 'P-0123', 1, 67000, 9000, 13000, 115000),
+  ('F-1942805643', 'P-1240', 1, 26000, 9000, 13000, 115000),
+  ('F-2021202223', 'P-9123', 1, 47000, 8000, 10000, 98000), 
+  ('F-1945329382', 'P-8413', 2, 33000, 5000, 8000, 46000);
+
+INSERT INTO `Driver` (`IDDriver`, `NamaDriver`, `PlatDriver`, `MotorDriver`) VALUES ('D-1234', 'Agam Maulana', 'B6394WUF', 'Honda Beat'),
+  ('D-2345', 'Adam Sagala', 'B4526VTI', 'Honda PCX'),
+  ('D-4321', 'Novi Marpaung', 'B9232AWW', 'Honda CBR');
+
+INSERT INTO `Produk` (`IDProduk`, `NamaProduk`, `Harga`) VALUES 
+  ('P-0123', 'Trio Hotdakk Mozarella', 67000),
+  ('P-1240', 'Pure Cocoa', 26000), 
+  ('P-9123', 'Nasi Uduk Babi', 47000), 
+  ('P-8413', 'Mie Ayam Spesial', 16500);
+
+INSERT INTO `Pelanggan` (`IDPelanggan`, `NamaPelanggan`, `AlamatPelanggan`) VALUES 
+  ('C-6198', 'Fepri Putra', 'Jl. Mawar 3 Blok C3 No.1, Kedaung, Pamulang, Kota Tangerang Selatan, Banten 15415, Indonesia'),
+  ('C-6969', 'Reyner Wongso', 'Jl. Melati 2 Blok D1 No.11, Kebon Jeruk, Jakarta Barat, DKI Jakarta 11530, Indonesia'),
+  ('C-6710', 'Sebastian Hariman', 'Jl. Anggrek 1 Blok A2 No. 2, Kebon Jeruk, Jakarta Barat, DKI Jakarta 11530, Indonesia');
+
+INSERT INTO `Toko` (`IDToko`, `NamaToko`, `AlamatToko`) VALUES
+  ('T-321', 'Chatime x Cupbop, LP Pamulang', 'Komplek Pamulang Permai, Jl. Pamulang Permai 1, Pamulang, Tangerang'),
+  ('T-564', 'Nasi Uduk Enak Tapi Haram', 'Jl.Kemanggisan'),
+  ('T-425', 'Mie Ayam Berkah', 'Jl.Berkah');
+
+INSERT INTO `Transaksi` (`OrderID`, `OrderDate`, `IDPelanggan`, `IDDriver`, `IDToko`, `WaktuPemesanan`, `WaktuPenerimaan`) VALUES
+  ('F-1942805643', '2022-08-12', 'C-6198', 'D-1234', 'T-321', '17:43', '18:06'), 
+  ('F-2021202223', '2022-08-14', 'C-6969', 'D-2345', 'T-564', '07:26', '07:51'), 
+  ('F-1945329382', '2022-08-20', 'C-6710', 'D-4321', 'T-425', '11:36', '12:02');
+
+ALTER TABLE `Produk` ADD PRIMARY KEY (`IDProduk`); 
+ALTER TABLE `Driver` ADD PRIMARY KEY (`IDDriver`); 
+ALTER TABLE `Pelanggan` ADD PRIMARY KEY (`IDPelanggan`); 
+ALTER TABLE `Toko` ADD PRIMARY KEY (`IDToko`);
+ALTER TABLE `transaksi` ADD PRIMARY KEY (`OrderID`); 
+
+ALTER TABLE `DetailTransaksi`
+ADD FOREIGN KEY (`OrderID`) REFERENCES `Transaksi` (`OrderID`),
+ADD FOREIGN KEY (`IDProduk`) REFERENCES `Produk` (`IDProduk`); 
+
+ALTER TABLE `Transaksi`
+ADD FOREIGN KEY (`IDPelanggan`) REFERENCES `Pelanggan` (`IDPelanggan`), 
+ADD FOREIGN KEY (`IDDriver`) REFERENCES `Driver` (`IDDriver`),
+ADD FOREIGN KEY (`IDToko`) REFERENCES `toko`(`IDToko`);
+
+CREATE VIEW `viewReport1` AS
+  SELECT * FROM `pelanggan` WHERE `NamaPelanggan` LIKE '%N%';
+CREATE VIEW `viewReport2` AS
+  SELECT * FROM `produk` WHERE `Harga` > 40000;
+CREATE VIEW `viewReport3` AS
+  SELECT P.IDProduk, P.NamaProduk, P.Harga, DT.OrderID 
+  FROM `produk` P 
+  JOIN `detailTransaksi` DT ON P.IDProduk = DT.IDProduk WHERE DT.Jumlah > 1;
+CREATE VIEW `viewReport4` AS
+  SELECT * FROM `transaksi` WHERE `waktupemesanan` BETWEEN '00:00' AND '12:00';
