@@ -1,0 +1,40 @@
+-- display all the data
+select * from books_scraped 
+
+-- show rating desc order
+select * from books_scraped order by Star_rating desc
+
+-- books who have rating of three
+select * from books_scraped WHERE Star_rating = 3
+
+-- books category who got rating three
+select Book_category from books_scraped WHERE Star_rating = 3
+
+-- order of books rating from high to low
+select Title, Book_category from books_scraped order by Star_rating
+
+-- which category have the most 5 rating
+select Book_category, count(*) as total from books_scraped where Star_rating = '5' order by total desc limit 1
+
+-- which category have the most 1 rating
+select Book_category, count(*) as total from books_scraped WHERE Star_rating = '1' order by total asc limit 1
+
+-- stock update sharp objects from 20 to 1
+select * from books_scraped WHERE Title = 'sharp objects';
+update books_scraped SET Quantity = 1 WHERE Title = 'sharp objects';
+select * from books_scraped WHERE Title = 'sharp objects';
+
+-- average rating for each category and round it to 2 decimals
+select Book_category, round(avg(Star_rating),2) as Average from books_scraped group by Book_category
+
+-- which book has the lowest stock
+select * from books_scraped WHERE Quantity = ( SELECT min(Quantity) FROM books_scraped);
+
+-- the average price for each category
+select Book_category, round(avg(price),2) as average from books_scraped group by Book_category order by average asc;
+
+-- the most & the least expensive books
+select Title, price from books_scraped WHERE price = (SELECT min(price) from books_scraped) union select Title, price from books_scraped WHERE price = (SELECT max(price) from books_scraped)
+
+-- delete a book
+DELETE FROM books_scraped WHERE Title = 'Thirst'
